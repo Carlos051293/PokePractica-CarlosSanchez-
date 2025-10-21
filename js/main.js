@@ -75,3 +75,53 @@ function mostrarPokemon(pokemon) {
 }
 
 btnMostrar.addEventListener("click", obtenerPokemons);
+
+// -----------------------------------------------------------
+//  Ejercicio 3 - Buscador de Pokémon con diseño personalizado
+// -----------------------------------------------------------
+
+const main = document.querySelector("main");
+const buscadorDiv = document.createElement("div");
+buscadorDiv.style.textAlign = "center";
+buscadorDiv.style.marginBottom = "2rem";
+buscadorDiv.innerHTML = `
+  <input type="text" id="buscador" placeholder="Buscar Pokémon por nombre o ID..." 
+         style="padding: 0.5rem 1rem; border-radius: 0.5rem; border: 1px solid #ccc; width: 60%;">
+  <button id="btnBuscar" style="padding: 0.5rem 1rem; margin-left: 1rem; border-radius: 0.5rem; background-color: var(--type-grass); font-weight: bold; cursor: pointer;">Buscar</button>
+`;
+main.insertBefore(buscadorDiv, document.getElementById("todos"));
+
+const inputBuscar = document.getElementById("buscador");
+const btnBuscar = document.getElementById("btnBuscar");
+
+btnBuscar.addEventListener("click", () => {
+  const nombre = inputBuscar.value.trim().toLowerCase();
+  if (nombre === "") {
+    alert("Introduce un nombre o ID de Pokémon");
+    return;
+  }
+  buscarPokemon(nombre);
+});
+
+inputBuscar.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    btnBuscar.click();
+  }
+});
+
+async function buscarPokemon(nombre) {
+  listaPokemon.innerHTML = "<p>Buscando Pokémon...</p>";
+
+  try {
+    const respuesta = await fetch(`https://pokeapi.co/api/v2/pokemon/${nombre}`);
+    if (!respuesta.ok) throw new Error("Pokémon no encontrado");
+
+    const datos = await respuesta.json();
+
+    listaPokemon.innerHTML = ""; 
+    mostrarPokemon(datos);
+  } catch (error) {
+    listaPokemon.innerHTML = `<p>No se encontró ningún Pokémon con ese nombre o ID </p>`;
+    console.error(error);
+  }
+}
